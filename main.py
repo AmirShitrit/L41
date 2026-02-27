@@ -1,16 +1,45 @@
-# This is a sample Python script.
+import os
 
-# Press Ctrl+F5 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import torch
+
+from config import (DATA_DIR, DEVICE, LR_FINETUNE, LR_FROZEN,
+                    NUM_EPOCHS_FINETUNE, NUM_EPOCHS_FROZEN)
+from data import build_dataloaders, build_transforms, load_datasets
+from evaluation import evaluate
+from model import build_model, unfreeze_last_blocks
+from trainer import train
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
+def main():
+    if not os.path.isdir(DATA_DIR):
+        print(f"Dataset not found at '{DATA_DIR}'.")
+        print("Download from: https://www.kaggle.com/datasets/maysee/mushrooms-classification-common-genuss-images")
+        print(f"Place it so that '{DATA_DIR}/<class_name>/*.jpg' structure is satisfied.")
+        return
+
+    train_tf, val_tf = build_transforms()
+    train_set, val_set, class_names = load_datasets(DATA_DIR, train_tf, val_tf)
+    train_loader, val_loader = build_dataloaders(train_set, val_set)
+
+    model = build_model(len(class_names))
+
+    print(f"Classes  : {class_names}")
+    print(f"Train/Val: {len(train_set)} / {len(val_set)} images")
+    print(f"Device   : {DEVICE}\n")
+
+    print("=== Phase 1: Head-only training (backbone frozen) ===")
+    train(model, train_loader, val_loader, NUM_EPOCHS_FROZEN, LR_FROZEN, "frozen ")
+
+    print("\n=== Phase 2: Fine-tuning (layer3 + layer4 + fc unfrozen) ===")
+    unfreeze_last_blocks(model)
+    train(model, train_loader, val_loader, NUM_EPOCHS_FINETUNE, LR_FINETUNE, "finetune")
+
+    print("\n=== Final Evaluation ===")
+    evaluate(model, val_loader, class_names)
+
+    torch.save(model.state_dict(), "mushroom_classifier.pth")
+    print("Model weights saved to mushroom_classifier.pth")
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    main()
