@@ -8,3 +8,6 @@
 3. before doing anything, print the statistics about the data: image sizes
    and other attributes, how many classes are there and how many samples of
    each class, is the dataset balanced?
+
+4. add the code to download the dataset if not already exists.
+   but exclude it from git (add to .gitignore)

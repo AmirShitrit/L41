@@ -1,10 +1,9 @@
-import os
-
 import torch
 
 from config import (DATA_DIR, DEVICE, LR_FINETUNE, LR_FROZEN,
                     NUM_EPOCHS_FINETUNE, NUM_EPOCHS_FROZEN)
 from data import build_dataloaders, build_transforms, load_datasets
+from download import download_dataset_if_needed
 from evaluation import evaluate
 from model import build_model, unfreeze_last_blocks
 from stats import print_dataset_stats
@@ -12,12 +11,7 @@ from trainer import train
 
 
 def main():
-    if not os.path.isdir(DATA_DIR):
-        print(f"Dataset not found at '{DATA_DIR}'.")
-        print("Download from: https://www.kaggle.com/datasets/maysee/mushrooms-classification-common-genuss-images")
-        print(f"Place it so that '{DATA_DIR}/<class_name>/*.jpg' structure is satisfied.")
-        return
-
+    download_dataset_if_needed(DATA_DIR)
     print_dataset_stats(DATA_DIR)
 
     train_tf, val_tf = build_transforms()

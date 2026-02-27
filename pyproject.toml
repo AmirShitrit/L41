@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
+    "kaggle>=1.6.0",
+    "python-dotenv>=1.0.0",
     "torch>=2.2.0",
     "torchvision>=0.17.0",
     "scikit-learn>=1.4.0",
