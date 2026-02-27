@@ -7,6 +7,7 @@ from config import (DATA_DIR, DEVICE, LR_FINETUNE, LR_FROZEN,
 from data import build_dataloaders, build_transforms, load_datasets
 from evaluation import evaluate
 from model import build_model, unfreeze_last_blocks
+from stats import print_dataset_stats
 from trainer import train
 
 
@@ -16,6 +17,8 @@ def main():
         print("Download from: https://www.kaggle.com/datasets/maysee/mushrooms-classification-common-genuss-images")
         print(f"Place it so that '{DATA_DIR}/<class_name>/*.jpg' structure is satisfied.")
         return
+
+    print_dataset_stats(DATA_DIR)
 
     train_tf, val_tf = build_transforms()
     train_set, val_set, class_names = load_datasets(DATA_DIR, train_tf, val_tf)
