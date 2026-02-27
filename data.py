@@ -1,7 +1,10 @@
 import random
 
+from PIL import ImageFile
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 from config import BATCH_SIZE, SEED, VAL_SPLIT
 
